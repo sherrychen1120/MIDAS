@@ -116,7 +116,7 @@ train_configs = {# model
                  'lrt': 2e-5,
                  'tau': 0.2,
                  'exploration_timesteps': 0,
-                 'value_net': 'set_transformer', # [vanilla, deep_set, deeper_deep_set, set_transformer, social_attention]
+                 'value_net': 'set_transformer', # [vanilla, deep_set, set_transformer, social_attention]
                  'future_state_dropout': 0.7, # probability of dropping out future states during training
                  'use_lstm': True, # if true, will use LSTMValueNet along with the configured value_net
                  # deep set

@@ -33,6 +33,7 @@ rl_agent_configs = [('',0.0)]
 
 ni_ep_len_dict = {1: 200, 2:200, 3:200}
 ni = 1
+na = 5
 date = '0321'
 env_configs = {# parametric state
               'use_global_frame': False, # whether to use global frame for the state vector
