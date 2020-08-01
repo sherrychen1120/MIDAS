@@ -1,7 +1,9 @@
 # MIDAS
 MIDAS: Multi-agent Interaction-aware Decision-making with Adaptive Strategies for Urban Autonomous Navigation
+
 Xiaoyi Chen, Pratik Chaudhari
-University of Pennsylvania
+
+Department of Electrical and Systems Engineering (TODO / or say GRASP Lab?), University of Pennsylvania
 
 ArXiv link (TODO)
 
@@ -11,7 +13,7 @@ Install Argoverse following the instructions here: https://github.com/argoai/arg
 Install `ffmpeg`
 
 ## Create collision and interaction sets
-1. To create collision sets, change `na` on line 6 to be the number of agents in the environment, and change `date` on line 7 of `road_interactions_environment/neighhood_v4_collision_set_gen.py`. Then run `python road_interactions_environment/neighhood_v4_collision_set_gen.py``python road_interactions_environment/neighhood_v4_collision_set_gen.py`.
+1. To create collision sets, change `na` on line 6 to be the number of agents in the environment, and change `date` on line 7 of `road_interactions_environment/neighhood_v4_collision_set_gen.py`. Then run `python road_interactions_environment/neighhood_v4_collision_set_gen.py`.
 2. To create interaction sets, follow the steps in `road_interactions_environment/neighhood_v4_interaction_set_creation.ipynb`.
 
 ## Train the model
