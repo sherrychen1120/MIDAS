@@ -26,7 +26,6 @@ from gym_road_interactions.core import AgentType, Position, Agent, ObservableSta
 from shapely.geometry import Point, Polygon
 from .neighborhood_env_v4_utils import calculate_remaining_lane_distance, calculate_traversed_lane_distance, calculate_time_to_collision, calculate_poly_distance, get_two_degree_successors
 
-sys.path.append('/home/xiaoyich/masters_thesis_main/policy_network')
 from neighborhood_v4_ddqn.models import DDQNAgent, TwinDDQNAgent
 
 logger = logging.getLogger(__name__)
@@ -37,7 +36,7 @@ TTC_HORIZON = 20
 TTC_VEL_PROD = 9.2
 DONE_THRES = 0.5 # distance threshold for completing the task
 
-# interface for Neighborhood-v0 agents that creates bbox, v_desired, implements drive_along_path and get_lane_priority and calculate_ttc
+# interface for Neighborhood-v4 agents that creates bbox, v_desired, implements drive_along_path and get_lane_priority and calculate_ttc
 class NeighborhoodV4AgentInterface(Agent):
     def __init__(self,
                  id: str,

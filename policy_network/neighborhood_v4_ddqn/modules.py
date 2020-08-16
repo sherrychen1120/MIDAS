@@ -22,7 +22,6 @@ class EgoAttention(nn.Module):
         K, V = self.fc_k(all_agents), self.fc_v(all_agents)
 
         dim_split = self.dim_hidden // self.num_heads
-        # pdb.set_trace()
         Q_ = torch.cat(Q.split(dim_split, 2), 0)
         K_ = torch.cat(K.split(dim_split, 2), 0)
         V_ = torch.cat(V.split(dim_split, 2), 0)
@@ -49,7 +48,6 @@ class MAB(nn.Module):
         K, V = self.fc_k(K), self.fc_v(K)
 
         dim_split = self.dim_V // self.num_heads
-        # pdb.set_trace()
         Q_ = torch.cat(Q.split(dim_split, 2), 0)
         K_ = torch.cat(K.split(dim_split, 2), 0)
         V_ = torch.cat(V.split(dim_split, 2), 0)

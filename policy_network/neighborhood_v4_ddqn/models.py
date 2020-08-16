@@ -496,7 +496,6 @@ class TwinDDQNAgent(object):
         self.replay_buffer = ReplayBuffer(int(train_configs['max_buffer_size']))
         self.log_name = log_name
 
-        # self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.device = device
         if 'use_lstm' in list(self.train_configs.keys()) and self.train_configs['use_lstm']:
             log(self.log_name, f"Using LSTMValueNet")
@@ -528,16 +527,12 @@ class TwinDDQNAgent(object):
         self.value_net_target.load_state_dict(self.value_net.state_dict())
         self.value_net_target.eval()
         self.value_net_optim = optim.Adam(self.value_net.parameters(), lr=self.train_configs['lrt'])
-        # self.value_net_optim = optim.RMSprop(self.value_net.parameters(), lr=self.train_configs['lrt'])
-
-        # self.sm = nn.Softmax(dim=1) # softmax used when generating random actions
 
     def select_action(self, parametric_state, b1, total_timesteps, test=False):
         if test or (total_timesteps > self.train_configs['exploration_timesteps']):
              # parametric_state: 1*(state_dim), tensor
             parametric_state = parametric_state.to(self.device)
             b1 = torch.tensor([[b1]]).to(self.device) # (1,1)
-            # v = self.value_net(parametric_state)
 
             sample = np.random.random()
             if test:
@@ -547,13 +542,6 @@ class TwinDDQNAgent(object):
                     math.exp(-1. * total_timesteps / self.train_configs['eps_decay'])
             if sample > eps_threshold:
                 with torch.no_grad():
-                    # == V0, V1 ==
-                    # t.max(1) will return largest column value of each row.
-                    # second column on max result is index of where max element was
-                    # found, so we pick action with the larger expected reward.
-                    # action = self.value_net.Q1(parametric_state, b1).max(1)[1].item()
-
-                    # == V2, V3, V4, V5 ==
                     Q1, Q2 = self.value_net(parametric_state, b1)
                     action = (Q1 + Q2).max(1)[1].item()
 
@@ -605,27 +593,6 @@ class TwinDDQNAgent(object):
         next_Q1_values_target, next_Q2_values_target = self.value_net_target(s_next, b1)
 
         # calculate Q(s_{t+1}, a')
-        # ======= BRANCHES =======
-        # == V0 ==
-        # actions = next_Q1_values.max(1)[1].long().view(-1,1)
-        # next_Q = torch.min(next_Q1_values_target.gather(1, actions), next_Q2_values_target.gather(1, actions))
-        # # Compute the target of the current Q values
-        # expected_Q = r + (self.train_configs['gamma'] * not_d * next_Q)
-        # # Compute Huber loss
-        # # loss = F.smooth_l1_loss(curr_Q, expected_Q)
-        # # Detach variable from the current graph since we don't want gradients for next Q to propagated
-        # loss = F.mse_loss(curr_Q1, expected_Q.detach()) + F.mse_loss(curr_Q2, expected_Q.detach())
-
-        # == V1 ==
-        # actions_1 = next_Q1_values.max(1)[1].long().view(-1,1)
-        # actions_2 = next_Q2_values.max(1)[1].long().view(-1,1)
-        # next_Q = torch.min(next_Q1_values_target.gather(1, actions_1), next_Q2_values_target.gather(1, actions_2))
-        # # Compute the target of the current Q values
-        # expected_Q = r + (self.train_configs['gamma'] * not_d * next_Q)
-        # # Compute loss
-        # loss = F.mse_loss(curr_Q1, expected_Q.detach()) + F.mse_loss(curr_Q2, expected_Q.detach())
-
-        # == V2 ==
         actions_1 = next_Q1_values.max(1)[1].long().view(-1,1)
         actions_2 = next_Q2_values.max(1)[1].long().view(-1,1)
         next_Q = torch.min(next_Q1_values_target.gather(1, actions_2), next_Q2_values_target.gather(1, actions_1))
@@ -633,81 +600,6 @@ class TwinDDQNAgent(object):
         expected_Q = r + (self.train_configs['gamma'] * not_d * next_Q)
         # Compute loss
         loss = F.mse_loss(curr_Q1, expected_Q.detach()) + F.mse_loss(curr_Q2, expected_Q.detach())
-
-        # == V3 ==
-        # actions = (next_Q1_values + next_Q2_values).max(1)[1].long().view(-1,1)
-        # next_Q = torch.min(next_Q1_values_target.gather(1, actions), next_Q2_values_target.gather(1, actions))
-        # # Compute the target of the current Q values
-        # expected_Q = r + (self.train_configs['gamma'] * not_d * next_Q)
-        # # Compute loss
-        # loss = F.mse_loss(curr_Q1, expected_Q.detach()) + F.mse_loss(curr_Q2, expected_Q.detach())
-
-        # == V3 ==
-        # actions = (next_Q1_values + next_Q2_values).max(1)[1].long().view(-1,1)
-        # next_Q = torch.min(next_Q1_values_target.gather(1, actions), next_Q2_values_target.gather(1, actions))
-        # # Compute the target of the current Q values
-        # expected_Q = r + (self.train_configs['gamma'] * not_d * next_Q)
-        # # Compute loss
-        # loss = F.mse_loss(curr_Q1, expected_Q.detach()) + F.mse_loss(curr_Q2, expected_Q.detach())
-
-        # == V4 ==
-        # actions_1 = next_Q1_values.max(1)[1].long().view(-1,1)
-        # actions_2 = next_Q2_values.max(1)[1].long().view(-1,1)
-        # next_Q_1 = next_Q1_values_target.gather(1, actions_2)
-        # next_Q_2 = next_Q2_values_target.gather(1, actions_1)
-        # # Compute the target of the current Q values
-        # expected_Q_1 = r + (self.train_configs['gamma'] * not_d * next_Q_1)
-        # expected_Q_2 = r + (self.train_configs['gamma'] * not_d * next_Q_2)
-        # # Compute loss
-        # loss = F.mse_loss(curr_Q1, expected_Q_1.detach()) + F.mse_loss(curr_Q2, expected_Q_2.detach())
-
-        # == V5 ==
-        # temp = np.random.random() # [0,1)
-        # # UPDATE(A)
-        # if temp < 0.5:
-        #     actions_2 = next_Q2_values.max(1)[1].long().view(-1,1)
-        #     next_Q_1 = next_Q1_values_target.gather(1, actions_2)
-        #     expected_Q_1 = r + (self.train_configs['gamma'] * not_d * next_Q_1)
-        #     loss = F.mse_loss(curr_Q1, expected_Q_1.detach())
-        # # UPDATE(B)
-        # else:
-        #     actions_1 = next_Q1_values.max(1)[1].long().view(-1,1)
-        #     next_Q_2 = next_Q2_values_target.gather(1, actions_1)
-        #     expected_Q_2 = r + (self.train_configs['gamma'] * not_d * next_Q_2)
-        #     loss = F.mse_loss(curr_Q2, expected_Q_2.detach())
-        
-        # == V6 ==
-        # actions_1 = next_Q1_values.max(1)[1].long().view(-1,1)
-        # actions_2 = next_Q2_values.max(1)[1].long().view(-1,1)
-        # actions = (next_Q1_values + next_Q2_values).max(1)[1].long().view(-1,1)
-        
-        # next_Q_V1 = torch.min(next_Q1_values_target.gather(1, actions_1), next_Q2_values_target.gather(1, actions_2))
-        # # Compute the target of the current Q values
-        # expected_Q_V1 = r + (self.train_configs['gamma'] * not_d * next_Q_V1)
-        # # Compute loss
-        # loss_V1 = F.mse_loss(curr_Q1, expected_Q_V1.detach()) + F.mse_loss(curr_Q2, expected_Q_V1.detach())
-
-        # next_Q_V2 = torch.min(next_Q1_values_target.gather(1, actions_2), next_Q2_values_target.gather(1, actions_1))
-        # # Compute the target of the current Q values
-        # expected_Q_V2 = r + (self.train_configs['gamma'] * not_d * next_Q_V2)
-        # # Compute loss
-        # loss_V2 = F.mse_loss(curr_Q1, expected_Q_V2.detach()) + F.mse_loss(curr_Q2, expected_Q_V2.detach())
-
-        # next_Q_V3 = torch.min(next_Q1_values_target.gather(1, actions), next_Q2_values_target.gather(1, actions))
-        # # Compute the target of the current Q values
-        # expected_Q_V3 = r + (self.train_configs['gamma'] * not_d * next_Q_V3)
-        # # Compute loss
-        # loss_V3 = F.mse_loss(curr_Q1, expected_Q_V3.detach()) + F.mse_loss(curr_Q2, expected_Q_V3.detach())
-
-        # # Compute the target of the current Q values
-        # expected_Q_1_V4 = r + (self.train_configs['gamma'] * not_d * next_Q1_values_target.gather(1, actions_2))
-        # expected_Q_2_V4 = r + (self.train_configs['gamma'] * not_d * next_Q2_values_target.gather(1, actions_1))
-        # # Compute loss
-        # loss_V4 = F.mse_loss(curr_Q1, expected_Q_1_V4.detach()) + F.mse_loss(curr_Q2, expected_Q_2_V4.detach())
-
-        # loss = loss_V1 + loss_V2 + loss_V3 + loss_V4
-        
-        # ======= END OF BRANCHES =======
 
         # Optimize
         self.value_net.zero_grad()
@@ -720,8 +612,6 @@ class TwinDDQNAgent(object):
         # Delayed policy updates
         self.steps_done += 1
         if ((self.steps_done + 1) % self.train_configs['target_update'] == 0):
-            # Update the frozen target models
-            # self.value_net_target.load_state_dict(self.value_net.state_dict())
             if self.log_name is not None:
                 log(self.log_name, f"[TwinDDQNAgent] Updating Target Network at steps_done = {self.steps_done}")
             for param, target_param in zip(self.value_net.parameters(), self.value_net_target.parameters()):

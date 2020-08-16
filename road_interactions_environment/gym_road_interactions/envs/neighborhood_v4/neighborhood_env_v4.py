@@ -39,15 +39,9 @@ DT = 0.1 # 10Hz
 FAD_COEFF = 0.3
 
 # load map
-is_server = False
-if is_server:
-    lane_segments_path = '/home/xiaoyich/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_map_lane_segments.pkl'
-    constants_path = '/home/xiaoyich/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_map_constants.pkl'
-    intersection_id_dict = '/home/xiaoyich/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_intersection_id_dict.pkl'
-else:
-    lane_segments_path = '/Users/sherrychen/Documents/UPenn/Academics/2020S/Research/Github repo/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_map_lane_segments.pkl'
-    constants_path = '/Users/sherrychen/Documents/UPenn/Academics/2020S/Research/Github repo/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_map_constants.pkl'
-    intersection_id_dict = '/Users/sherrychen/Documents/UPenn/Academics/2020S/Research/Github repo/masters_thesis_main/road_interactions_environment/gym_road_interactions/envs/maps/neighborhood_v0_intersection_id_dict.pkl'
+lane_segments_path = '../maps/neighborhood_v0_map_lane_segments.pkl'
+constants_path = '../maps/neighborhood_v0_map_constants.pkl'
+intersection_id_dict = '../maps/neighborhood_v0_intersection_id_dict.pkl'
 with open(lane_segments_path, 'rb') as f:
     lane_segments = pickle.load(f)
 with open(constants_path, 'rb') as f:
@@ -176,12 +170,6 @@ class NeighborhoodEnvV4(gym.Env):
 
             # === create ego ===
             if ('c1' not in self.env_config_.keys()) or (self.env_config_['c1'] == 0):
-                # = Hardcoded stuff for c0-5 to c0-8 =
-                # conditional_log(self.log_name_, logger, f'making c0 env left turn', 'debug')
-                # ego_pos = self.__compute_position_from_lane_waypoint('B3', -250)
-                # ego_goal_pos = self.__compute_position_from_lane_waypoint('B0', -1)
-                # ego_path = ['B3','B10','B0']
-                # = c0-9, c0-10 random left/right turn =
                 conditional_log(self.log_name_, logger, f'making c0 env left/right turn', 'debug')
                 # select ego_path
                 select_turn = np.random.randint(2)
@@ -193,15 +181,7 @@ class NeighborhoodEnvV4(gym.Env):
                     conditional_log(self.log_name_, logger,'right turn')
                     ego_goal_pos = self.__compute_position_from_lane_waypoint('B4', -1)
                     ego_path = ['B3','B9','B4']
-                # select ego_pos (always starting at -250 of lane order 0)
-                # if (('fix_ego_start' in self.env_config_.keys()) and (self.env_config_['fix_ego_start'])) or \
-                #     ('fix_ego_start' not in self.env_config_.keys()):
-                #     lane_order = 0
-                #     waypt_idx = len(self.lane_segments_[ego_path[lane_order]].centerline) - 250 # default fixed if it's not set
-                # else:
-                #     lane_order = np.random.randint(len(ego_path))
-                #     lane_cl_len = len(self.lane_segments_[ego_path[lane_order]].centerline)
-                #     waypt_idx = np.random.randint(lane_cl_len)
+
                 lane_order = 0
                 waypt_idx = len(self.lane_segments_[ego_path[lane_order]].centerline) - 250 # default fixed if it's not set
                 ego_pos = self.__compute_position_from_lane_waypoint(ego_path[lane_order], waypt_idx)
@@ -239,48 +219,6 @@ class NeighborhoodEnvV4(gym.Env):
             self.agents_['0'] = NeighborhoodV4EgoAgentWrapper(new_ego_agent, self.env_config_['max_num_other_agents'])
             conditional_log(self.log_name_, logger, f'ego_path: {str(ego_path)}, lane_order: {lane_order}, waypt_idx: {waypt_idx}, ego pseudo_id: ' + self.agents_['0'].pseudo_id_, 'debug')
             # === create agents ===
-
-            # TIME
-            # curr = time.time()
-            # print(f'ego init: {curr - self.time_start_}s')
-
-            # = Hardcoded stuff for debug = collision setup
-            # agent_pos = self.__compute_position_from_lane_waypoint('B3', 250)
-            # agent_goal_pos = self.__compute_position_from_lane_waypoint('B0', -1)
-            # agent_path = ['B3','B10','B0']
-            # temp_agent = NeighborhoodV0DefaultAgent(id='1', observable_state=ObservableState(agent_pos, 0.0, 0.0),
-            #                                     goal=ObservableState(agent_goal_pos, 0.0, 0.0), 
-            #                                     curr_lane_id_order=0, # Note: setting this to an earlier lane will let the agent keep going without stopping along lane
-            #                                     curr_waypoint_idx=250,
-            #                                     agg_level=1,
-            #                                     path = agent_path,
-            #                                     default_ttc = self.default_ttc_,
-            #                                     lane_segments = self.lane_segments_,
-            #                                     stochastic_stop = self.env_config_['agent_stochastic_stop'],
-            #                                     log_name = self.log_name_)
-            # self.agents_['1'] = temp_agent
-            # DEBUG
-            # print(temp_agent.v_desired_)
-            # print(self.__meets_spacing_requirement(temp_agent, self.agents_))
-            # print(self.__check_any_collision(temp_agent, self.agents_))
-
-            # agent_pos = self.__compute_position_from_lane_waypoint('B5', -250)
-            # agent_goal_pos = self.__compute_position_from_lane_waypoint('B2', -1)
-            # agent_path = ['B5','B11','B2']
-            # temp_agent = NeighborhoodV4DefaultAgent(id='2', observable_state=ObservableState(agent_pos, 0.0, 0.0),
-            #                                     goal=ObservableState(agent_goal_pos, 0.0, 0.0), 
-            #                                     curr_lane_id_order=0, # Note: setting this to an earlier lane will let the agent keep going without stopping along lane
-            #                                     curr_waypoint_idx=1050,
-            #                                     agg_level=0,
-            #                                     path = agent_path,
-            #                                     default_ttc = self.default_ttc_,
-            #                                     lane_segments = self.lane_segments_,
-            #                                     stochastic_stop = self.env_config_['agent_stochastic_stop'],
-            #                                     log_name = self.log_name_)
-            # self.agents_['1'] = temp_agent
-            # = end of hard coded stuff =
-
-            # # = real stuff: generate num_agents of other agents in expanded lane set =
             temp_agents = self.generate_other_agents(ego_path, self.env_config_['num_other_agents'])
             if temp_agents is None: # if generating other agents failed
                 return None, self.agents_['0'].b1_
@@ -540,11 +478,6 @@ class NeighborhoodEnvV4(gym.Env):
         # only step forward if the system is not done yet
         if not self.done_:
             # update ttc for everyone
-            # == old version ==
-            # for id in range(1 + self.env_config_['num_other_agents']):
-            #     agent_id = str(id)
-            #     self.agents_[agent_id].calculate_ttc(self.agents_, self.dt_) # O(n^2)
-            # == dp version ==
             self.__update_ttc_dp() # O(2n^2)
 
             # TIME
@@ -557,7 +490,6 @@ class NeighborhoodEnvV4(gym.Env):
             for i in range(1 + self.env_config_['num_other_agents']):
                 agent_id = str(i)
                 self.agents_[agent_id].calculate_ttc(self.agents_, self.dt_, self.ttc_dp_)
-            # === 
 
             # TIME
             if self.profiling_:
@@ -947,27 +879,6 @@ class NeighborhoodEnvV4(gym.Env):
         return ttc_values
 
     def __update_ttc_dp(self) -> None:
-        # ttc_dp = np.ones((4, 1 + self.env_config_['num_other_agents'], 
-        #                     1 + self.env_config_['num_other_agents'])) * self.default_ttc_
-        # for id1 in range(self.env_config_['num_other_agents']):
-        #     for id2 in range(id1 + 1, 1 + self.env_config_['num_other_agents']):
-        #         # table 0: assuming everyone at current speed
-        #         ttc_dp[0, id1, id2] = calculate_time_to_collision(self.agents_[str(id1)], self.agents_[str(id2)], 
-        #                                     self.default_ttc_, self.dt_, 0, 0)
-        #         ttc_dp[0, id2, id1] = ttc_dp[0, id1, id2]
-        #         # table 1: assuming the agent with smaller id stops, larger id goes
-        #         ttc_dp[1, id1, id2] = calculate_time_to_collision(self.agents_[str(id1)], self.agents_[str(id2)], 
-        #                                     self.default_ttc_, self.dt_, -1, 1)
-        #         ttc_dp[2, id2, id1] = ttc_dp[1, id1, id2]
-        #         # table 2: assuming the agent with smaller id goes, larger id stops
-        #         ttc_dp[2, id1, id2] = calculate_time_to_collision(self.agents_[str(id1)], self.agents_[str(id2)], 
-        #                                     self.default_ttc_, self.dt_, 1, -1)  
-        #         ttc_dp[1, id2, id1] = ttc_dp[2, id1, id2]
-        #         # table 3: assuming both agent goes
-        #         ttc_dp[3, id1, id2] = calculate_time_to_collision(self.agents_[str(id1)], self.agents_[str(id2)], 
-        #                                     self.default_ttc_, self.dt_, 1, 1)
-        #         ttc_dp[3, id2, id1] = ttc_dp[3, id1, id2]                                                 
-        
         # all default ttc values
         N = 1 + self.env_config_['num_other_agents'] # for the sake of readability
         H = self.agents_['0'].ttc_horizon_ # for the sake of readability
@@ -1133,23 +1044,7 @@ class NeighborhoodEnvV4(gym.Env):
                     should_stop = self.agents_['0'].should_stop_wrapped(self.dt_, self.agents_, self.ttc_dp_,
                         self.env_config_['ego_baseline'], self.env_config_['include_agents_within_range'], 
                         self.env_config_['ego_ttc_break_tie'])
-                        
-            # if (ego_min_ttc < self.agents_['0'].ttc_thres_) and (self.agents_['0'].should_apply_ttc_penalty(self.agents_)):
-            #     should_stop = self.agents_['0'].should_stop(self.dt_, self.agents_)
-            #     ego_vel = self.agents_['0'].observable_state_.velocity_
-            #     if (should_stop and ego_vel > 0.0) or ((not should_stop) and (ego_vel == 0.0)):
-            #         ttc_penalty = - 5.0 * (self.agents_['0'].ttc_thres_ - ego_min_ttc)
-            #         conditional_log(self.log_name_, logger, f'ttc penalty {ttc_penalty:.1f} given ttc: {ego_min_ttc:.1f} | should_stop={should_stop}, ego_vel={ego_vel}', 'debug')
-            #         reward += ttc_penalty
 
-            # print this out just to debug, but we don't use this info
-            # ego_should_stop = self.agents_['0'].should_stop(self.dt_, self.agents_, self.ttc_dp_)
-            # conditional_log(self.log_name_, logger, f'ego should stop: {should_stop}', 'debug')
-            # if should_stop and self.agents_['0'].past_ttc_[2] < self.agents_['0'].past_ttc_[1] and \
-            #     self.agents_['0'].past_ttc_[1] < 8.0:
-            #     print(self.agents_['0'].past_ttc_)
-            #     pdb.set_trace()
-            
             # 5. r_v: velocity reward
             if self.agents_['0'].observable_state_.velocity_ > 0:
                 w, b = self.env_config_['velocity_reward_coeff']
@@ -1260,15 +1155,6 @@ class NeighborhoodEnvV4(gym.Env):
             if self.__detect_collision(input_agent, agent):
                 return True
         return False
-    
-    # def debug_check_any_collision(self, input_agent: Agent, agents: List[Agent]) -> bool:
-    #     for agent_id, agent in agents.items():
-    #         if agent_id == str(input_agent.id_): # don't compare with self
-    #             continue
-    #         if self.__detect_collision(input_agent, agent):
-    #             print(f"colliding with {agent_id}")
-    #             return True
-    #     return False
 
     def __meets_spacing_requirement(self, input_agent: Agent, agents: List[Agent]):
         for other_agent_id, other_agent in agents.items():
@@ -1292,16 +1178,6 @@ class NeighborhoodEnvV4(gym.Env):
             if min_ttc < input_agent.ttc_thres_ or min_ttc < other_agent.ttc_thres_: # my position has to meet ttc threshold requirement of both me and the other guy
                 return False # doesn't meet requirement
         return True
-    
-    # def debug_meets_spacing_requirement(self, input_agent: Agent, agents: List[Agent]):
-    #     for agent_id, agent in agents.items():
-    #         if agent_id == str(input_agent.id_): # don't compare with self
-    #             continue
-    #         ttc = calculate_time_to_collision(input_agent, agent, self.default_ttc_, self.dt_, 1, 1)
-    #         if ttc <= 1.5 * input_agent.ttc_thres_ or ttc <= 1.5 * agent.ttc_thres_: # my position has to meet ttc threshold requirement of both me and the other guy
-    #             print(f"ttc not met with {agent_id}")
-    #             return False
-    #     return True
 
     # == helper functions related to random router ==   
     def __generate_path_in_set(self, lane_id:str, lane_id_set: Set[str]) -> List[str]:

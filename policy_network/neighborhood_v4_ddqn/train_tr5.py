@@ -251,7 +251,7 @@ for collision_set_path in collision_set_path_list:
         for key in ['agent_stochastic_stop', 
                     'agent_shuffle_ids', 'ego_num_intersections_in_path',
                     'expanded_lane_set_depth', 'c1', 'ego_expand_path_depth', 
-                    'single_intersection_type','ego_velocity_coeff','agent_velocity_coeff']: # we don't check for single_intersection_type cuz it's not gonna be the same
+                    'single_intersection_type','ego_velocity_coeff','agent_velocity_coeff']:
             if ((key not in env_configs) and (key in saved_env_config)) or \
             ((key in env_configs) and (key not in saved_env_config)) or \
             (env_configs[key] != saved_env_config[key]):
@@ -328,8 +328,6 @@ if load_model:
 else:
     # save init of RL2_model
     agent.save([], RL2_model_path)
-
-# pdb.set_trace()
 
 # timing
 time_start = time.time()
@@ -445,7 +443,7 @@ while total_timesteps < train_configs['max_timesteps']:
         for key in ['agent_stochastic_stop', 
                     'agent_shuffle_ids', 'ego_num_intersections_in_path',
                     'expanded_lane_set_depth', 'c1', 'ego_expand_path_depth', 
-                    'single_intersection_type','ego_velocity_coeff','agent_velocity_coeff']: # 'ego_expand_path_depth' and 'c1' not tested for 0313 and 0314 eval sets
+                    'single_intersection_type','ego_velocity_coeff','agent_velocity_coeff']:
             if ((key not in env.env_config_) and (key in saved_env_config)) or \
             ((key in env.env_config_) and (key not in saved_env_config)) or \
             (env.env_config_[key] != saved_env_config[key]):
