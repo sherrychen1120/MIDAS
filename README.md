@@ -1,5 +1,6 @@
 # MIDAS: Multi-agent Interaction-aware Decision-making with Adaptive Strategies for Urban Autonomous Navigation
 Xiaoyi Chen, Pratik Chaudhari
+
 GRASP Lab, University of Pennsylvania
 
 [TODO insert ArXiv link here]
