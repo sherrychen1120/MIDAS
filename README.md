@@ -1,5 +1,8 @@
-# MIDAS
-MIDAS: Multi-agent Interaction-aware Decision-making with Adaptive Strategies for Urban Autonomous Navigation
+# MIDAS: Multi-agent Interaction-aware Decision-making with Adaptive Strategies for Urban Autonomous Navigation
+Xiaoyi Chen, Pratik Chaudhari
+GRASP Lab, University of Pennsylvania
+
+[TODO insert ArXiv link here]
 
 ## Prepare the environment
 Install Argoverse following the instructions here: https://github.com/argoai/argoverse-api
