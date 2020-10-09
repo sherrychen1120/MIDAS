@@ -3,7 +3,7 @@ Xiaoyi Chen, Pratik Chaudhari
 
 GRASP Lab, University of Pennsylvania
 
-[TODO insert ArXiv link here]
+ArXiV: https://arxiv.org/abs/2008.07081
 
 ## Prepare the environment
 Install Argoverse following the instructions here: https://github.com/argoai/argoverse-api
