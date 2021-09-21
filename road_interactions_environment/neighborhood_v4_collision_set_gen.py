@@ -51,7 +51,7 @@ env_configs = {# parametric state
               'include_agents_within_range': 10.0, # the range within which agents will be included.
               'agent_state_dim': 6+4+10*2+1, # state dim at a single ts. related to 'include_ttc', 'include_polygon_dist', 'include_future_waypoints''
               # num agents (change training env_config with this)
-              'num_other_agents': 0, # this will change
+              'num_other_agents': na, # this will change
               'max_num_other_agents': 25, # could only be 25, 40, 60 (one of the upper limits)
               'max_num_other_agents_in_range': 25, # >=6. max number of other agents in range. Must be <= max_num_other_agents. default 25.
               # agent behavior
